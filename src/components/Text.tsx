@@ -33,7 +33,7 @@ interface Props {
   text: string | number | JSX.Element;
   style?: StyleProp<TextStyle>;
   wrapperStyle?: StyleProp<ViewStyle>;
-  color?: keyof typeof theme.colors;
+  color?: string;
   align?: "center" | "left" | "right" | "justify";
   spacing?: keyof typeof theme.spacing;
   underlined?: boolean;
