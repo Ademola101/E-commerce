@@ -13,6 +13,7 @@ type Theme = {
     white: string;
     border: string;
     shadow: string;
+    black: string;
   };
   spacing: {
     none: number;
@@ -39,6 +40,7 @@ export const theme: Theme = {
     white: '#FFFFFF',
     border: '#F0F0F0',
     shadow: 'rgba(0, 0, 0, 0.1)',
+    black: '#000000',
   },
   spacing: {
     none: 0,
