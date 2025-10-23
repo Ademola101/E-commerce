@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "e-commerce",
+    "name": "Pandar E-Commerce",
     "slug": "e-commerce",
     "version": "1.0.0",
     "orientation": "default",
@@ -17,7 +17,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFD93D"
       },
-      "package": "com.ecommerce"
+      "package": "com.ecommerce",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,6 +40,11 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "aa1a90b9-dc26-4f57-afb5-efacb61646da"
+      }
+    }
   }
 }
