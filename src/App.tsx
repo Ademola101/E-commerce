@@ -3,13 +3,14 @@ import { Asset } from "expo-asset";
 import { createURL } from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import * as React from "react";
-import { Navigation } from "./navigation";
+import { Navigation, AdminNavigation } from "./navigation";
 import useLoadFont from "./hooks/useLoadFont";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FlashMessage from "react-native-flash-message";
 import Constants from "expo-constants";
 import { theme } from "../config/theme";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 Asset.loadAsync([
   ...NavigationAssets,
@@ -34,8 +35,10 @@ export function App() {
   }
 
   return (
+
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRoot}>
-      <Navigation
+      <BottomSheetModalProvider>
+      <AdminNavigation
         linking={{
           enabled: "auto",
           prefixes: [prefix],
@@ -57,6 +60,7 @@ export function App() {
         icon={{ icon: "auto", position: "left" }}
         style={{ marginTop: Constants.statusBarHeight }}
       />
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }
