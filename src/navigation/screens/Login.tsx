@@ -5,11 +5,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Text from '../../components/Text';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuthStore } from '../../hooks/useAuth';
 
 
 const Login = () => {
   const insets = useSafeAreaInsets();
-  
+  const { loginAsAdmin, loginAsUser } = useAuthStore();
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.xxlg }]}>
       <Animated.View 
@@ -36,6 +38,7 @@ const Login = () => {
           <TouchableOpacity 
             style={[styles.card, styles.adminCard]}
             activeOpacity={0.8}
+            onPress={loginAsAdmin}
           >
             <View style={[styles.iconContainer, { backgroundColor: theme.colors.primaryLight }]}>
               <Ionicons name="shield-checkmark" size={40} color={theme.colors.primary} />
@@ -59,6 +62,7 @@ const Login = () => {
           <TouchableOpacity 
             style={[styles.card, styles.userCard]}
             activeOpacity={0.8}
+            onPress={loginAsUser}
           >
             <View style={[styles.iconContainer, { backgroundColor: theme.colors.primaryLight }]}>
               <Ionicons name="person" size={40} color={theme.colors.primary} />
