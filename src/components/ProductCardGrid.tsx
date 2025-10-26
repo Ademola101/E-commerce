@@ -1,6 +1,5 @@
 import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
 import Text from "./Text";
 import { theme } from "../../config/theme";
 import type { ProductType } from "../types";
@@ -26,16 +25,7 @@ const ProductCardGrid: React.FC<ProductCardGridProps> = ({
     >
       <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
 
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => onDelete(product.id)}
-      >
-        <Ionicons
-          name="trash-outline"
-          size={18}
-          color={theme.colors.accentPink}
-        />
-      </TouchableOpacity>
+      
 
       <View style={styles.productInfo}>
         <Text

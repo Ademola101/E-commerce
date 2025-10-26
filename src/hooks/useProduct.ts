@@ -3,12 +3,12 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { storage, zustandStorage } from "../../config/mmkv";
 import { ProductType } from "../types";
 
-
+type CartItem = ProductType & { quantity: number };
 type ProductState = {
-  products: ProductType[];
-  addProduct: (product: ProductType) => void;
+  products: CartItem[];
+  addProduct: (product: CartItem) => void;
   removeProduct: (id: string) => void;
-  updateProduct: (updatedProduct: ProductType) => void;
+  updateProduct: (updatedProduct: CartItem) => void;
 };
 
 export const useProductStore = create<ProductState>()(

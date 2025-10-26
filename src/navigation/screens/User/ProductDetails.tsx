@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -16,6 +16,8 @@ import { useCartStore } from "../../../hooks/useProduct";
 import { useToastMessage } from "../../../hooks/useToastMessage";
 import type { ProductType } from "../../../types";
 import { formatToMoney } from "../../../utils/formatToMoney";
+import CartIcon from "../../../components/CartIcon";
+
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,7 +30,6 @@ const ProductDetails = () => {
   const { showToast } = useToastMessage();
   const [quantity, setQuantity] = useState(1);
 
-  
   const isInCart = products.some((item) => item.id === product.id);
 
   const handleAddToCart = () => {
@@ -60,189 +61,56 @@ const ProductDetails = () => {
     navigation.goBack();
   };
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: product.name,
+      headerRight: () => <CartIcon />,
+    });
+  }, [navigation, product.name]);
+
   return (
     <View style={styles.container}>
-      {/* Header with back button */}
-      <View
-        style={[
-          styles.header,
-          { paddingTop: insets.top + 10, paddingHorizontal: 20 },
-        ]}
-      >
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme.colors.textPrimary}
-          />
-        </TouchableOpacity>
-        <Text
-          variant="h5Bold"
-          text="Product Details"
-          color={theme.colors.textPrimary}
-        />
-        <View style={styles.placeholder} />
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Product Image */}
+        
         <View style={styles.imageContainer}>
           <Image source={{ uri: product.imageUrl }} style={styles.image} />
         </View>
-
-        {/* Product Info */}
-        <View style={styles.contentContainer}>
-          {/* Name and Price */}
-          <View style={styles.titleSection}>
-            <Text
-              variant="h3"
-              text={product.name}
-              color={theme.colors.textPrimary}
-              style={styles.productName}
-            />
-            <Text
-              variant="h4Bold"
-              text={formatToMoney(product.price)}
-              color={theme.colors.primary}
-            />
-          </View>
-
-          {/* Description */}
-          <View style={styles.section}>
-            <Text
-              variant="body1Bold"
-              text="Description"
-              color={theme.colors.textPrimary}
-              spacing="md"
-            />
-            <Text
-              variant="body1"
-              text={product.description}
-              color={theme.colors.textSecondary}
-              style={styles.description}
-            />
-          </View>
-
-          {/* Quantity Selector */}
-          <View style={styles.section}>
-            <Text
-              variant="body1Bold"
-              text="Quantity"
-              color={theme.colors.textPrimary}
-              spacing="md"
-            />
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.quantityButton,
-                  quantity === 1 && styles.quantityButtonDisabled,
-                ]}
-                onPress={decrementQuantity}
-                disabled={quantity === 1}
-              >
-                <Ionicons
-                  name="remove"
-                  size={20}
-                  color={
-                    quantity === 1
-                      ? theme.colors.textTertiary
-                      : theme.colors.textPrimary
-                  }
-                />
-              </TouchableOpacity>
-
-              <View style={styles.quantityDisplay}>
-                <Text
-                  variant="h5Bold"
-                  text={quantity}
-                  color={theme.colors.textPrimary}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={incrementQuantity}
-              >
-                <Ionicons
-                  name="add"
-                  size={20}
-                  color={theme.colors.textPrimary}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Total Price */}
-          <View style={styles.totalContainer}>
-            <Text
-              variant="body1"
-              text="Total Price"
-              color={theme.colors.textSecondary}
-            />
-            <Text
-              variant="h4Bold"
-              text={formatToMoney(product.price * quantity)}
-              color={theme.colors.primary}
-            />
-          </View>
-
-          {/* Features/Info Cards */}
-          <View style={styles.featuresContainer}>
-            <View style={styles.featureCard}>
-              <Ionicons
-                name="shield-checkmark"
-                size={24}
-                color={theme.colors.primary}
-              />
-              <Text
-                variant="body2Bold"
-                text="Quality Assured"
-                color={theme.colors.textPrimary}
-                style={styles.featureText}
-              />
-            </View>
-
-            <View style={styles.featureCard}>
-              <Ionicons
-                name="rocket"
-                size={24}
-                color={theme.colors.accentPink}
-              />
-              <Text
-                variant="body2Bold"
-                text="Fast Delivery"
-                color={theme.colors.textPrimary}
-                style={styles.featureText}
-              />
-            </View>
-
-            <View style={styles.featureCard}>
-              <Ionicons
-                name="refresh"
-                size={24}
-                color={theme.colors.accent}
-              />
-              <Text
-                variant="body2Bold"
-                text="Easy Returns"
-                color={theme.colors.textPrimary}
-                style={styles.featureText}
-              />
-            </View>
-          </View>
-        </View>
       </ScrollView>
 
-      {/* Fixed Bottom Button */}
       <View
-        style={[
-          styles.bottomContainer,
-          { paddingBottom: insets.bottom + 16 },
-        ]}
+        style={[styles.bottomContainer, { paddingBottom: insets.bottom + 16 }]}
       >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: theme.spacing.md,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <Image
+              source={{ uri: product.imageUrl }}
+              style={{ width: 60, height: 60, borderRadius: 8 }}
+            />
+            <Text
+              variant="body1Bold"
+              text={product.name}
+              color={theme.colors.textPrimary}
+              style={{ marginTop: theme.spacing.s }}
+            />
+          </View>
+
+          <Text
+            variant="body1Bold"
+            text={formatToMoney(product.price * quantity)}
+            color={theme.colors.primary}
+            style={{ marginTop: theme.spacing.s }}
+          />
+        </View>
         <TouchableOpacity
           style={[
             styles.addToCartButton,
@@ -274,24 +142,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    marginHorizontal: theme.spacing.md,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingBottom: 16,
-    backgroundColor: theme.colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  
   placeholder: {
     width: 40,
   },
@@ -391,6 +244,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
+    borderRadius: (height + width) * 0.02,
   },
   addToCartButton: {
     backgroundColor: theme.colors.primary,
@@ -398,7 +252,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: (height + width) * 0.02,
     gap: theme.spacing.md,
   },
   addToCartButtonDisabled: {

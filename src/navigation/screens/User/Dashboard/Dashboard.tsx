@@ -2,22 +2,23 @@ import { StyleSheet, View, FlatList, Dimensions, Alert } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import Text from "../../../components/Text";
-import ProductCardGrid from "../../../components/ProductCardGrid";
-import EmptyState from "../../../components/EmptyState";
-import { theme } from "../../../../config/theme";
-import { useProductStore } from "../../../hooks/useProduct";
-import { useToastMessage } from "../../../hooks/useToastMessage";
-import type { ProductType } from "../../../types";
-import { useAuthStore } from "../../../hooks/useAuth";
-import FloatingButton from "../../../components/FloatingButton";
+import Text from "../../../../components/Text";
+import ProductCardGrid from "../../../../components/ProductCardGrid";
+import EmptyState from "../../../../components/EmptyState";
+import { theme } from "../../../../../config/theme";
+import { useProductStore } from "../../../../hooks/useProduct";
+import { useToastMessage } from "../../../../hooks/useToastMessage";
+import type { ProductType } from "../../../../types";
+import { useAuthStore } from "../../../../hooks/useAuth";
+import FloatingButton from "../../../../components/FloatingButton";
+import CartIcon from "../../../../components/CartIcon";
 
 const { width } = Dimensions.get("window");
 const CARD_SPACING = theme.spacing.lg;
 const HORIZONTAL_PADDING = 20;
 
 const Dashboard = () => {
-  const {logout} = useAuthStore();
+  const { logout } = useAuthStore();
   const insets = useSafeAreaInsets();
   const { products, removeProduct } = useProductStore();
   const { showToast } = useToastMessage();
@@ -41,10 +42,10 @@ const Dashboard = () => {
     );
   };
 
-  // Filter products based on search query
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDeleteProduct = (id: string) => {
@@ -52,7 +53,13 @@ const Dashboard = () => {
     showToast("Product removed from list", "success");
   };
 
-  const renderProduct = ({ item, index }: { item: ProductType; index: number }) => {
+  const renderProduct = ({
+    item,
+    index,
+  }: {
+    item: ProductType;
+    index: number;
+  }) => {
     const isLeftColumn = index % 2 === 0;
     return (
       <View
@@ -81,40 +88,6 @@ const Dashboard = () => {
     </View>
   );
 
-  const renderHeader = () => (
-    <View style={styles.statsContainer}>
-      <View style={styles.statCard}>
-        <Ionicons name="cube" size={24} color={theme.colors.primary} />
-        <Text
-          variant="h3"
-          text={products.length}
-          color={theme.colors.textPrimary}
-          style={styles.statNumber}
-        />
-        <Text
-          variant="body2"
-          text="Total Products"
-          color={theme.colors.textSecondary}
-        />
-      </View>
-
-      <View style={styles.statCard}>
-        <Ionicons name="pricetag" size={24} color={theme.colors.accentPink} />
-        <Text
-          variant="h3"
-          text={filteredProducts.length}
-          color={theme.colors.textPrimary}
-          style={styles.statNumber}
-        />
-        <Text
-          variant="body2"
-          text="Showing"
-          color={theme.colors.textSecondary}
-        />
-      </View>
-    </View>
-  );
-
   return (
     <View
       style={[
@@ -122,21 +95,21 @@ const Dashboard = () => {
         { paddingTop: insets.top + 20, paddingHorizontal: HORIZONTAL_PADDING },
       ]}
     >
-      {/* Header */}
       <View style={styles.headerContainer}>
         <View>
           <Text
             variant="h3"
-            text="Product Dashboard"
+            text="Buy amazing Products"   
             color={theme.colors.textPrimary}
           />
           <Text
             variant="body1"
-            text="Browse and manage your products"
+            text="Explore our wide range of products"
             color={theme.colors.textSecondary}
             spacing="lg"
           />
         </View>
+        <CartIcon size={28} />
       </View>
 
       {/* Search Bar */}
@@ -150,7 +123,9 @@ const Dashboard = () => {
         <Text
           variant="body1"
           text={searchQuery || "Search products..."}
-          color={searchQuery ? theme.colors.textPrimary : theme.colors.textSecondary}
+          color={
+            searchQuery ? theme.colors.textPrimary : theme.colors.textSecondary
+          }
           style={styles.searchText}
         />
       </View>
@@ -165,7 +140,6 @@ const Dashboard = () => {
         columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderEmptyState}
-        ListHeaderComponent={products.length > 0 ? renderHeader : null}
       />
       <FloatingButton icon="log-out-outline" onPress={handleLogout} />
     </View>
@@ -202,26 +176,7 @@ const styles = StyleSheet.create({
   searchText: {
     flex: 1,
   },
-  statsContainer: {
-    flexDirection: "row",
-    gap: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: 12,
-    padding: theme.spacing.lg,
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  statNumber: {
-    marginVertical: theme.spacing.s,
-  },
+
   listContainer: {
     flexGrow: 1,
     paddingBottom: 20,

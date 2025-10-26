@@ -8,12 +8,8 @@ import Text from "../../../components/Text";
 import { theme } from "../../../../config/theme";
 import { useToastMessage } from "../../../hooks/useToastMessage";
 import { z } from "zod";
-import {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetBackdrop,
-} from "@gorhom/bottom-sheet";
-import { Controller, useForm } from "react-hook-form";
+
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProductStore } from "../../../hooks/useProduct";
 import type { ProductType } from "../../../types";
@@ -25,6 +21,7 @@ import FormInput from "../../../components/FormInput";
 
 import EmptyState from "../../../components/EmptyState";
 import ImagePickerField from "../../../components/ImagePicker";
+import { useNavigation } from "@react-navigation/native";
 
 const generateUniqueId = (): string => {
   return Math.random().toString(36).substr(2, 9);
@@ -47,6 +44,7 @@ type FormData = {
 };
 
 const Admin = () => {
+  const navigation = useNavigation<any>();
   const { logout } = useAuthStore();
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -62,82 +60,18 @@ const Admin = () => {
   };
   
   const insets = useSafeAreaInsets();
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-  const [image, setImage] = useState<string | null>(null);
   const { showToast } = useToastMessage();
-  const { products, addProduct, removeProduct } = useProductStore();
+  const { products,removeProduct } = useProductStore();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: "",
-    },
-  });
 
-  const handleOpenModal = useCallback(() => {
-    bottomSheetRef.current?.present();
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    bottomSheetRef.current?.dismiss();
-    reset();
-    setImage(null);
-  }, [reset]);
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const onSubmit = (data: FormData) => {
-    if (!image) {
-      showToast("Please select an image", "danger");
-      return;
-    }
-
-    const newProduct: ProductType = {
-      id: generateUniqueId(),
-      name: data.name,
-      description: data.description,
-      price: parseFloat(data.price),
-      imageUrl: image,
-    };
-
-    addProduct(newProduct);
-    showToast("Product added successfully!", "success");
-    handleCloseModal();
-  };
+  
 
   const handleDeleteProduct = (id: string) => {
     removeProduct(id);
     showToast("Product deleted", "success");
   };
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-      />
-    ),
-    []
-  );
+  
 
   const renderProduct = ({ item }: { item: ProductType }) => (
     <ProductCard product={item} onDelete={handleDeleteProduct} />
@@ -170,7 +104,7 @@ const Admin = () => {
           />
         </View>
         <TouchableOpacity
-          onPress={handleOpenModal}
+          onPress={() => navigation.navigate("AddNewProduct")}
           style={styles.addButton}
         >
           <Ionicons name="add" size={28} color={theme.colors.white} />
@@ -186,106 +120,7 @@ const Admin = () => {
         ListEmptyComponent={renderEmptyState}
       />
 
-      <BottomSheetModal
-        ref={bottomSheetRef}
-        snapPoints={["90%"]}
-        backdropComponent={renderBackdrop}
-        enablePanDownToClose
-        keyboardBehavior="interactive"
-        keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustResize"
-      >
-        <BottomSheetView style={styles.bottomSheetContent}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-          >
-            <ScrollView 
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.header}>
-                <Text
-                  variant="h3"
-                  text="Add New Product"
-                  color={theme.colors.textPrimary}
-                />
-                <TouchableOpacity onPress={handleCloseModal}>
-                  <Ionicons
-                    name="close"
-                    size={24}
-                    color={theme.colors.textPrimary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <ImagePickerField
-                imageUri={image}
-                onPress={pickImage}
-                placeholder="Tap to add image"
-              />
-
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, value } }) => (
-                  <FormInput
-                    label="Product Name"
-                    placeholder="Enter product name"
-                    value={value}
-                    onChangeText={onChange}
-                    error={errors.name?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, value } }) => (
-                  <FormInput
-                    label="Description"
-                    placeholder="Enter product description"
-                    value={value}
-                    onChangeText={onChange}
-                    error={errors.description?.message}
-                    isTextArea
-                    multiline
-                    numberOfLines={4}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="price"
-                render={({ field: { onChange, value } }) => (
-                  <FormInput
-                    label="Price"
-                    placeholder="Enter price"
-                    value={value}
-                    onChangeText={onChange}
-                    error={errors.price?.message}
-                    keyboardType="decimal-pad"
-                  />
-                )}
-              />
-
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSubmit(onSubmit)}
-              >
-                <Text
-                  variant="body1Bold"
-                  text="Add Product"
-                  color={theme.colors.white}
-                />
-              </TouchableOpacity>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </BottomSheetView>
-      </BottomSheetModal>
+      
       
       <FloatingButton 
         onPress={handleLogout}
@@ -324,22 +159,5 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 20,
   },
-  bottomSheetContent: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: theme.spacing.xxlg,
-  },
-  submitButton: {
-    backgroundColor: theme.colors.primary,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 12,
-    marginBottom: 30,
-  },
+  
 });
