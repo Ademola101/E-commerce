@@ -1,65 +1,111 @@
-# Starter Template with React Navigation
+# E-Commerce Mobile App
 
-This is a minimal starter template for React Native apps using Expo and React Navigation.
+A full-featured e-commerce mobile application built with React Native and Expo, featuring user authentication, product browsing, shopping cart, and admin dashboard.
 
-It includes the following:
+## Features
 
-- Example [Native Stack](https://reactnavigation.org/docs/native-stack-navigator) with a nested [Bottom Tab](https://reactnavigation.org/docs/bottom-tab-navigator)
-- Web support with [React Native for Web](https://necolas.github.io/react-native-web/)
-- TypeScript support and configured for React Navigation
-- Automatic [deep link](https://reactnavigation.org/docs/deep-linking) and [URL handling configuration](https://reactnavigation.org/docs/configuring-links)
-- Theme support [based on system appearance](https://reactnavigation.org/docs/themes/#using-the-operating-system-preferences)
-- Expo [Development Build](https://docs.expo.dev/develop/development-builds/introduction/) with [Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)
+- 🛍️ Browse and search products
+- 🛒 Shopping cart functionality
+- 👤 User authentication and profiles
+- 📱 Admin dashboard for product management
+- 💳 Product details and variants
+- 📦 Order management
 
-## Getting Started
+## Screenshots
 
-1. Create a new project using this template:
+<p align="center">
+  <img src="./assets/Admin.png" alt="Admin Dashboard" width="250" />
+  <img src="./assets/AddProduct.png" alt="Add Product" width="250" />
+  <img src="./assets/Admin.png" alt="Admin User Dashboard" width="250" />
+</p>
 
+<p align="center">
+  <img src="./assets/ProductDetails.png" alt="Product Details" width="250" />
+  <img src="./assets/Cart.png" alt="Shopping Cart" width="250" />
+</p>
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- For iOS: macOS with Xcode installed
+- For Android: Android Studio installed
+
+### Installation
+
+1. Clone the repository:
    ```sh
-   npx create-expo-app@latest --template react-navigation/template
+   git clone <your-repo-url>
+   cd <project-folder>
    ```
 
-2. Edit the `app.json` file to configure the `name`, `slug`, `scheme` and bundle identifiers (`ios.bundleIdentifier` and `android.bundleIdentifier`) for your app.
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
 
-3. Edit the `src/App.tsx` file to start working on your app.
+### Running the App
 
-## Running the app
+**Important:** This app uses native packages and **cannot be run with Expo Go**. You must use a development build.
 
-- Install the dependencies:
+#### Option 1: Run on iOS Simulator (macOS only)
 
-  ```sh
-  npm install
-  ```
+```sh
+npm run ios
+```
 
-- Start the development server:
+This will build and launch the app in the iOS Simulator.
 
-  ```sh
-  npm start
-  ```
+#### Option 2: Run on Android Emulator/Device
 
-- Build and run iOS and Android development builds:
+```sh
+npm run android
+```
 
-  ```sh
-  npm run ios
-  # or
-  npm run android
-  ```
+This will build and launch the app on a connected Android device or running emulator via Android Studio.
 
-- In the terminal running the development server, press `i` to open the iOS simulator, `a` to open the Android device or emulator, or `w` to open the web browser.
+#### Option 3: Install APK on Android Device
 
-## Notes
+1. Build the development APK:
+   ```sh
+   eas build --profile development --platform android
+   ```
 
-This project uses a [development build](https://docs.expo.dev/develop/development-builds/introduction/) and cannot be run with [Expo Go](https://expo.dev/go). To run the app with Expo Go, edit the `package.json` file, remove the `expo-dev-client` package and `--dev-client` flag from the `start` script.
+2. Once the build completes, download the APK file from the Expo dashboard.
 
-We highly recommend using the development builds for normal development and testing.
+3. Transfer the APK to your Android device and install it.
 
-The `ios` and `android` folder are gitignored in the project by default as they are automatically generated during the build process ([Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)). This means that you should not edit these folders directly and use [config plugins](https://docs.expo.dev/config-plugins/) instead. However, if you need to edit these folders, you can remove them from the `.gitignore` file so that they are tracked by git.
+4. Start the development server:
+   ```sh
+   npm start
+   ```
+
+5. Open the app on your device and connect to the development server.
+
+## Why Expo Go Won't Work
+
+This project uses native packages and modules that require custom native code. Expo Go only supports a limited set of packages from the Expo SDK. To run this app, you must use a development build which includes all the necessary native dependencies.
+
+## Development Build
+
+This project uses [Expo Development Builds](https://docs.expo.dev/develop/development-builds/introduction/) which provide a customizable runtime environment for your app, allowing you to include any native code your app needs while still maintaining the fast development workflow of Expo.
+
+## Tech Stack
+
+- React Native
+- Expo
+- TypeScript
+- React Navigation
+- Expo Development Build
 
 ## Resources
 
-- [React Navigation documentation](https://reactnavigation.org/)
-- [Expo documentation](https://docs.expo.dev/)
+- [Expo Documentation](https://docs.expo.dev/)
+- [React Native Documentation](https://reactnative.dev/)
+- [EAS Build Documentation](https://docs.expo.dev/build/introduction/)
 
 ---
 
-Demo assets are from [lucide.dev](https://lucide.dev/)
+For support or questions, please open an issue in the repository.
