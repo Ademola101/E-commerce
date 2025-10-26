@@ -1,4 +1,5 @@
-import { StyleSheet, TouchableOpacity, View, TextInput, Image, ScrollView, FlatList, KeyboardAvoidingView, Platform } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ScrollView,
+  FlatList, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import React, { useCallback, useRef, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,7 +17,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProductStore } from "../../../hooks/useProduct";
 import type { ProductType } from "../../../types";
-import { formatToMoney } from "../../../utils/formatToMoney";
+import FloatingButton from "../../../components/FloatingButton";
+import { useAuthStore } from "../../../hooks/useAuth";
+import ProductCard from "../../../components/ProductCard";
+
+import FormInput from "../../../components/FormInput";
+
+import EmptyState from "../../../components/EmptyState";
+import ImagePickerField from "../../../components/ImagePicker";
 
 const generateUniqueId = (): string => {
   return Math.random().toString(36).substr(2, 9);
@@ -39,6 +47,20 @@ type FormData = {
 };
 
 const Admin = () => {
+  const { logout } = useAuthStore();
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: () => {
+          logout();
+        },
+      },
+    ]);
+  };
+  
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -84,7 +106,7 @@ const Admin = () => {
 
   const onSubmit = (data: FormData) => {
     if (!image) {
-      showToast("Please select an image", "error");
+      showToast("Please select an image", "danger");
       return;
     }
 
@@ -118,52 +140,15 @@ const Admin = () => {
   );
 
   const renderProduct = ({ item }: { item: ProductType }) => (
-    <View style={styles.productCard}>
-      <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
-      <View style={styles.productInfo}>
-        <Text
-          variant="h6Bold"
-          text={item.name}
-          color={theme.colors.textPrimary}
-          lines={1}
-        />
-        <Text
-          variant="body2"
-          text={item.description}
-          color={theme.colors.textSecondary}
-          lines={2}
-          style={styles.productDescription}
-        />
-        <Text
-          variant="body1Bold"
-          text={formatToMoney(item.price)}
-          color={theme.colors.primary}
-        />
-      </View>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDeleteProduct(item.id)}
-      >
-        <Ionicons name="trash-outline" size={20} color={theme.colors.accentPink} />
-      </TouchableOpacity>
-    </View>
+    <ProductCard product={item} onDelete={handleDeleteProduct} />
   );
 
   const renderEmptyState = () => (
-    <View style={styles.emptyState}>
-      <Ionicons name="cube-outline" size={64} color={theme.colors.textTertiary} />
-      <Text
-        variant="h5"
-        text="No Products Yet"
-        color={theme.colors.textSecondary}
-        style={styles.emptyText}
-      />
-      <Text
-        variant="body2"
-        text="Tap the + button to add your first product"
-        color={theme.colors.textTertiary}
-      />
-    </View>
+    <EmptyState
+      icon="cube-outline"
+      title="No Products Yet"
+      subtitle="Tap the + button to add your first product"
+    />
   );
 
   return (
@@ -235,125 +220,58 @@ const Admin = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* Image Picker */}
-              <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-                {image ? (
-                  <Image source={{ uri: image }} style={styles.image} />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons
-                      name="camera"
-                      size={40}
-                      color={theme.colors.textSecondary}
-                    />
-                    <Text
-                      variant="body2"
-                      text="Tap to add image"
-                      color={theme.colors.textSecondary}
-                      style={styles.imageText}
-                    />
-                  </View>
-                )}
-              </TouchableOpacity>
+              <ImagePickerField
+                imageUri={image}
+                onPress={pickImage}
+                placeholder="Tap to add image"
+              />
 
-              {/* Product Name */}
-              <View style={styles.inputContainer}>
-                <Text
-                  variant="body1Bold"
-                  text="Product Name"
-                  color={theme.colors.textPrimary}
-                  spacing="s"
-                />
-                <Controller
-                  control={control}
-                  name="name"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter product name"
-                      value={value}
-                      onChangeText={onChange}
-                      placeholderTextColor={theme.colors.textSecondary}
-                    />
-                  )}
-                />
-                {errors.name && (
-                  <Text
-                    variant="body3"
-                    text={errors.name.message || ""}
-                    color={theme.colors.accentPink}
-                    style={styles.errorText}
+              <Controller
+                control={control}
+                name="name"
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    label="Product Name"
+                    placeholder="Enter product name"
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.name?.message}
                   />
                 )}
-              </View>
+              />
 
-              {/* Description */}
-              <View style={styles.inputContainer}>
-                <Text
-                  variant="body1Bold"
-                  text="Description"
-                  color={theme.colors.textPrimary}
-                  spacing="s"
-                />
-                <Controller
-                  control={control}
-                  name="description"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      style={[styles.input, styles.textArea]}
-                      placeholder="Enter product description"
-                      value={value}
-                      onChangeText={onChange}
-                      multiline
-                      numberOfLines={4}
-                      textAlignVertical="top"
-                      placeholderTextColor={theme.colors.textSecondary}
-                    />
-                  )}
-                />
-                {errors.description && (
-                  <Text
-                    variant="body3"
-                    text={errors.description.message || ""}
-                    color={theme.colors.accentPink}
-                    style={styles.errorText}
+              <Controller
+                control={control}
+                name="description"
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    label="Description"
+                    placeholder="Enter product description"
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.description?.message}
+                    isTextArea
+                    multiline
+                    numberOfLines={4}
                   />
                 )}
-              </View>
+              />
 
-              {/* Price */}
-              <View style={styles.inputContainer}>
-                <Text
-                  variant="body1Bold"
-                  text="Price"
-                  color={theme.colors.textPrimary}
-                  spacing="s"
-                />
-                <Controller
-                  control={control}
-                  name="price"
-                  render={({ field: { onChange, value } }) => (
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter price"
-                      value={value}
-                      onChangeText={onChange}
-                      keyboardType="decimal-pad"
-                      placeholderTextColor={theme.colors.textSecondary}
-                    />
-                  )}
-                />
-                {errors.price && (
-                  <Text
-                    variant="body3"
-                    text={errors.price.message || ""}
-                    color={theme.colors.accentPink}
-                    style={styles.errorText}
+              <Controller
+                control={control}
+                name="price"
+                render={({ field: { onChange, value } }) => (
+                  <FormInput
+                    label="Price"
+                    placeholder="Enter price"
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.price?.message}
+                    keyboardType="decimal-pad"
                   />
                 )}
-              </View>
+              />
 
-              {/* Submit Button */}
               <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleSubmit(onSubmit)}
@@ -368,6 +286,14 @@ const Admin = () => {
           </KeyboardAvoidingView>
         </BottomSheetView>
       </BottomSheetModal>
+      
+      <FloatingButton 
+        onPress={handleLogout}
+        icon="log-out-outline"
+        label="Logout"
+        backgroundColor={theme.colors.accentPink}
+        position={{ bottom: 30, right: 20 }}
+      />
     </View>
   );
 };
@@ -398,47 +324,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 20,
   },
-  productCard: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: 12,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    flexDirection: "row",
-    elevation: 2,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    backgroundColor: theme.colors.background,
-  },
-  productInfo: {
-    flex: 1,
-    marginLeft: theme.spacing.lg,
-    justifyContent: "space-between",
-  },
-  productDescription: {
-    marginVertical: theme.spacing.s,
-  },
-  deleteButton: {
-    padding: theme.spacing.s,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 60,
-  },
-  emptyText: {
-    marginTop: theme.spacing.lg,
-    marginBottom: theme.spacing.s,
-  },
   bottomSheetContent: {
     flex: 1,
     paddingHorizontal: 20,
@@ -448,50 +333,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: theme.spacing.xxlg,
-  },
-  imagePicker: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
-    overflow: "hidden",
-    marginBottom: theme.spacing.xxlg,
-    backgroundColor: theme.colors.background,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderStyle: "dashed",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  imagePlaceholder: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  imageText: {
-    marginTop: theme.spacing.md,
-  },
-  inputContainer: {
-    marginBottom: theme.spacing.lg,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: theme.colors.textPrimary,
-    backgroundColor: theme.colors.white,
-    fontFamily: "Regular",
-  },
-  textArea: {
-    height: 100,
-    paddingTop: 12,
-  },
-  errorText: {
-    marginTop: theme.spacing.s,
   },
   submitButton: {
     backgroundColor: theme.colors.primary,
