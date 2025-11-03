@@ -2,9 +2,8 @@ import { StyleSheet, View, FlatList, TouchableOpacity } from "react-native";
 import React, { useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 
-import { ProductType } from "../../../../types";
+import { DELIVERY_FEE, ProductType } from "../../../../types";
 
 import Text from "../../../../components/Text";
 import { formatToMoney } from "../../../../utils/formatToMoney";
@@ -13,48 +12,13 @@ import { theme } from "../../../../../config/theme";
 import { useCartStore } from "../../../../hooks/useProduct";
 import { useToastMessage } from "../../../../hooks/useToastMessage";
 import CartItemSwipeable from "../../../../components/CartItemSwipeable";
-
-const DELIVERY_FEE = 5.0;
-const DISCOUNT_THRESHOLD = 3;
-const DISCOUNT_PERCENTAGE = 0.5; 
+import { useCartCalculation } from "../../../../hooks/useCartCalculation";
 
 const Cart = () => {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
   const { products, removeProduct, updateProduct } = useCartStore();
   const { showToast } = useToastMessage();
-
-  
-  const { subtotal, discount, total } = useMemo(() => {
-    let subtotalAmount = 0;
-    let discountAmount = 0;
-
-    const productGroups = products.reduce((acc, product) => {
-      if (!acc[product.id]) {
-        acc[product.id] = { ...product, totalQuantity: 0 };
-      }
-      acc[product.id].totalQuantity += product.quantity || 0;
-      return acc;
-    }, {} as Record<string, ProductType & { quantity: number; totalQuantity: number }>);
-
-    products.forEach((product) => {
-      const itemTotal = product.price * product.quantity;
-      subtotalAmount += itemTotal;
-
-      const productGroup = productGroups[product.id];
-      if (productGroup.totalQuantity >= DISCOUNT_THRESHOLD) {
-        discountAmount += itemTotal * DISCOUNT_PERCENTAGE;
-      }
-    });
-
-    const totalAmount = subtotalAmount - discountAmount + DELIVERY_FEE;
-
-    return {
-      subtotal: subtotalAmount,
-      discount: discountAmount,
-      total: totalAmount,
-    };
-  }, [products]);
+  const { subtotal, discount, total } = useCartCalculation(products);
 
   const handleDeleteProduct = (id: string) => {
     removeProduct(id);
@@ -66,10 +30,6 @@ const Cart = () => {
     if (product) {
       updateProduct({ ...product, quantity });
     }
-  };
-
-  const handleGoBack = () => {
-    navigation.goBack();
   };
 
   const handleCheckout = () => {
@@ -105,7 +65,7 @@ const Cart = () => {
         spacing="lg"
       />
 
-      {/* Subtotal */}
+      
       <View style={styles.summaryRow}>
         <Text
           variant="body1"
@@ -119,7 +79,7 @@ const Cart = () => {
         />
       </View>
 
-      {/* Delivery Fee */}
+      
       <View style={styles.summaryRow}>
         <Text
           variant="body1"
@@ -133,7 +93,7 @@ const Cart = () => {
         />
       </View>
 
-      {/* Discount */}
+      
       {discount > 0 && (
         <View style={styles.summaryRow}>
           <View style={styles.discountLabel}>
@@ -157,10 +117,10 @@ const Cart = () => {
         </View>
       )}
 
-      {/* Divider */}
+      
       <View style={styles.divider} />
 
-      {/* Total */}
+      
       <View style={styles.summaryRow}>
         <Text variant="h6Bold" text="Total" color={theme.colors.textPrimary} />
         <Text
@@ -170,7 +130,6 @@ const Cart = () => {
         />
       </View>
 
-      {/* Discount Info */}
       {discount === 0 && (
         <View style={styles.discountInfo}>
           <Ionicons
@@ -191,9 +150,6 @@ const Cart = () => {
 
   return (
     <View style={styles.container}>
-      
-
-      {/* Cart Items */}
       <FlatList
         data={products}
         renderItem={renderCartItem}
@@ -204,7 +160,6 @@ const Cart = () => {
         ListFooterComponent={products.length > 0 ? renderSummary : null}
       />
 
-      {/* Checkout Button */}
       {products.length > 0 && (
         <View
           style={[

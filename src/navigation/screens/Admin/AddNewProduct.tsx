@@ -43,10 +43,10 @@ type FormData = {
   price: string;
 };
 const AddNewProduct = () => {
-    const navigation = useNavigation<any>();
+  const navigation = useNavigation<any>();
   const [image, setImage] = useState<string | null>(null);
   const { showToast } = useToastMessage();
-  const {  addProduct } = useProductStore();
+  const { addProduct } = useProductStore();
 
   const {
     control,
@@ -87,7 +87,7 @@ const AddNewProduct = () => {
       price: parseFloat(data.price),
       imageUrl: image,
     };
-
+    // @ts-ignore
     addProduct(newProduct);
     reset();
     navigation.dispatch(
@@ -96,23 +96,19 @@ const AddNewProduct = () => {
         routes: [{ name: "Admin" }],
       })
     );
-    
+
     showToast("Product added successfully!", "success");
   };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1,
-        padding: 20
-       }}
+      style={{ flex: 1, padding: 20 }}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        
-
         <ImagePickerField
           imageUri={image}
           onPress={pickImage}

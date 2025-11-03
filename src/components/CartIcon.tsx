@@ -17,7 +17,7 @@ const CartIcon: React.FC<CartIconProps> = ({
   size = 24,
   onPress,
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { products } = useCartStore();
   const cartItemCount = products.length;
 
@@ -26,7 +26,7 @@ const CartIcon: React.FC<CartIconProps> = ({
       onPress();
     } else {
       // Default navigation to cart screen
-      navigation.navigate("Cart" as never);
+      navigation.navigate("Cart");
     }
   };
 

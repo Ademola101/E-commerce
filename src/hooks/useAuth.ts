@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { zustandStorage } from "../../config/mmkv";
-
-type UserRole = "admin" | "user" | "guest";
+import { UserRole } from "../utils/role";
 
 type AuthState = {
   userRole: UserRole;
@@ -20,16 +19,16 @@ type AuthState = {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      userRole: "guest",
+      userRole: UserRole.GUEST,
       isAuthenticated: false,
 
-      loginAsAdmin: () => set({ userRole: "admin", isAuthenticated: true }),
-      loginAsUser: () => set({ userRole: "user", isAuthenticated: true }),
-      logout: () => set({ userRole: "guest", isAuthenticated: false }),
+      loginAsAdmin: () => set({ userRole: UserRole.ADMIN, isAuthenticated: true }),
+      loginAsUser: () => set({ userRole: UserRole.USER, isAuthenticated: true }),
+      logout: () => set({ userRole: UserRole.GUEST, isAuthenticated: false }),
 
-      isAdmin: () => get().userRole === "admin",
-      isUser: () => get().userRole === "user",
-      isGuest: () => get().userRole === "guest",
+      isAdmin: () => get().userRole === UserRole.ADMIN,
+      isUser: () => get().userRole === UserRole.USER,
+      isGuest: () => get().userRole === UserRole.GUEST,
     }),
     {
       name: "auth-storage",

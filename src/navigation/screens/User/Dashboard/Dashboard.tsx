@@ -130,7 +130,6 @@ const Dashboard = () => {
         />
       </View>
 
-      {/* Product Grid */}
       <FlatList
         data={filteredProducts}
         renderItem={renderProduct}

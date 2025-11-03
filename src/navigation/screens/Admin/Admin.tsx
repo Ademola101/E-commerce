@@ -1,7 +1,5 @@
-import { StyleSheet, TouchableOpacity, View, ScrollView,
-  FlatList, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
-import * as ImagePicker from "expo-image-picker";
+import { StyleSheet, TouchableOpacity, View,
+  FlatList, Alert } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Text from "../../../components/Text";
@@ -9,39 +7,15 @@ import { theme } from "../../../../config/theme";
 import { useToastMessage } from "../../../hooks/useToastMessage";
 import { z } from "zod";
 
-
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useProductStore } from "../../../hooks/useProduct";
 import type { ProductType } from "../../../types";
 import FloatingButton from "../../../components/FloatingButton";
 import { useAuthStore } from "../../../hooks/useAuth";
 import ProductCard from "../../../components/ProductCard";
 
-import FormInput from "../../../components/FormInput";
-
 import EmptyState from "../../../components/EmptyState";
-import ImagePickerField from "../../../components/ImagePicker";
 import { useNavigation } from "@react-navigation/native";
 
-const generateUniqueId = (): string => {
-  return Math.random().toString(36).substr(2, 9);
-};
-
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
-  price: z
-    .string()
-    .min(1, "Price is required")
-    .transform((val) => parseFloat(val))
-    .refine((val) => !isNaN(val) && val >= 0, "Price must be a valid number >= 0"),
-});
-
-type FormData = {
-  name: string;
-  description: string;
-  price: string;
-};
 
 const Admin = () => {
   const navigation = useNavigation<any>();
@@ -67,8 +41,22 @@ const Admin = () => {
   
 
   const handleDeleteProduct = (id: string) => {
-    removeProduct(id);
-    showToast("Product deleted", "success");
+    Alert.alert(
+      "Delete Product",
+      "Are you sure you want to delete this product?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            removeProduct(id);
+            showToast("Product deleted successfully", "success");
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   

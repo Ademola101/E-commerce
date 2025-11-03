@@ -68,7 +68,6 @@ const CartItemSwipeable: React.FC<CartItemSwipeableProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Delete Button (Hidden Behind) */}
       <View style={styles.deleteContainer}>
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Ionicons name="trash" size={24} color={theme.colors.white} />
